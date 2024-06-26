@@ -76,6 +76,6 @@ fn read_xlsx(folder: &str) {
 }
 
 fn main() {
-    let filespath = "./data";
+    let filespath = "src/data";
     read_xlsx(filespath);
 }

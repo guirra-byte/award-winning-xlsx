@@ -8,4 +8,4 @@ calamine = "0.25.0"
 
 [[bin]]
 name = "award-winning-csv"
-path = "main.rs"
+path = "src/main.rs"
