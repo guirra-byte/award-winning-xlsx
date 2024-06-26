@@ -1,0 +1,11 @@
+[package]
+name = "award-winning-csv"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+calamine = "0.25.0"
+
+[[bin]]
+name = "award-winning-csv"
+path = "main.rs"
