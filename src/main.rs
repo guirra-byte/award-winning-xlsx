@@ -1,19 +1,25 @@
 use calamine::{open_workbook, Reader, Xlsx};
-use std::fs;
+use std::fs::{self};
+use std::time;
 
+struct FileProps {
+    folder: String,
+    filename: String,
+    start_at: time::Instant,
+}
 struct AwardProps {
     name: String,
     amount: u64,
     month: String,
 }
 
-fn reader(root_dir: &str, file: &str) {
-    let mut filepath = String::from(root_dir);
-    filepath += &"/";
-    filepath += file;
+fn reader(mut root_path: String, file: &str, at: time::Instant) {
+    root_path += &"/";
+    root_path += file;
 
     // let mut goals_book: Vec<AwardProps> = vec![];
-    let mut workbook: Xlsx<_> = open_workbook(filepath).expect("Não foi possível abrir o arquivo.");
+    let mut workbook: Xlsx<_> =
+        open_workbook(root_path).expect("Não foi possível abrir o arquivo.");
     for sheet_name in workbook.sheet_names().to_owned() {
         let worksheet = workbook.worksheet_range(&sheet_name);
         match worksheet {
@@ -32,9 +38,10 @@ fn reader(root_dir: &str, file: &str) {
 
                                 let winner = 55000;
                                 if cell.amount >= winner {
+                                    let execution = at.elapsed();
                                     println!(
-                                        "Rust find the winner in month {}, and his name is {}.",
-                                        cell.month, cell.name
+                                        "Rust find the winner in month {}, and his name is {} on \n At {:?}",
+                                        cell.month, cell.name, execution
                                     );
                                 }
                             }
@@ -43,7 +50,6 @@ fn reader(root_dir: &str, file: &str) {
                             }
                         }
                     }
-                    // goals_book.push(cell);
                 }
             }
             Err(error) => {
@@ -53,8 +59,9 @@ fn reader(root_dir: &str, file: &str) {
     }
 }
 
-fn read_xlsx(folder: &str) {
-    let dir_content = fs::read_dir(folder).expect("Não foi possível ler a pasta de arquivos.");
+fn read_xlsx(folder: String) {
+    let dir_content =
+        fs::read_dir(folder.clone()).expect("Não foi possível ler a pasta de arquivos.");
     for entry in dir_content {
         match entry {
             Ok(entry) => {
@@ -62,14 +69,22 @@ fn read_xlsx(folder: &str) {
                 if path.is_file() {
                     match name.to_str() {
                         Some(filename) => {
-                            reader(folder, filename);
+                            let start = time::Instant::now();
+                            let file: FileProps = FileProps {
+                                filename: filename.to_string(),
+                                folder: folder.clone(),
+                                start_at: start,
+                            };
+
+                            println!("Iniciando verificação dos arquivos: {:?}", file.start_at);
+                            reader(file.folder, &file.filename, file.start_at);
                         }
                         None => todo!(),
                     }
                 }
             }
-            Err(e) => {
-                eprintln!("Error ao ler o diretório {}", folder);
+            Err(_e) => {
+                eprintln!("Error ao ler o diretório {}", folder.clone());
             }
         }
     }
@@ -77,5 +92,5 @@ fn read_xlsx(folder: &str) {
 
 fn main() {
     let filespath = "src/data";
-    read_xlsx(filespath);
+    read_xlsx(filespath.to_string());
 }
