@@ -1,7 +1,7 @@
 # Award Winning.xlsx
-### Aplicação de Verificação de Vencedor de Premiação
-
-Esta aplicação em Rust verifica planilhas no formato .xlsx para identificar os vendedores que possuem um total de vendas acima de 55.000 durante um período de 6 meses. Entre os mais de mil vendedores, a aplicação determina o vencedor da premiação.
+## Resolução de Caso de Uso usando Rust
+### Caso de Uso:
+Verificar planilhas no formato .xlsx para identificar dentre os mais de 900 vendedores quais possuem um total de vendas acima de 55.000 em um período de 6 meses. Entre os mais de 1.000 vendedores, a aplicação determina o vencedor da premiação e o mês em que a meta foi batida pelo vendedor em questão.
 
 Funcionalidades:
 - [x] Ler arquivos .xlsx de uma pasta específica.
