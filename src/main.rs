@@ -1,5 +1,6 @@
 use calamine::{open_workbook, Reader, Xlsx};
 use std::fs::{self};
+use std::ptr::addr_of;
 use std::time;
 
 struct FileProps {
@@ -42,7 +43,8 @@ fn reader(mut root_path: String, file: &str, at: time::Instant) {
                                     month: file.to_string(),
                                 };
 
-                                let already_computed = unsafe { &COMPUTED }
+                                let already_computed = unsafe { addr_of!(COMPUTED).as_ref() }
+                                    .unwrap()
                                     .iter()
                                     .enumerate()
                                     .find(|(_, seller)| seller.name == cell.name);
@@ -86,7 +88,6 @@ fn reader(mut root_path: String, file: &str, at: time::Instant) {
 
 fn read_xlsx(folder: String) {
     let dir_content = fs::read_dir(folder.clone());
-    let mut computed: Vec<PodiumProps> = vec![];
     match dir_content {
         Ok(dir) => {
             for entry in dir {
@@ -96,7 +97,7 @@ fn read_xlsx(folder: String) {
                         if path.is_file() {
                             match name.to_str() {
                                 Some(filename) => {
-                                    let start = time::Instant::now();
+                                    let start: time::Instant = time::Instant::now();
                                     let file: FileProps = FileProps {
                                         filename: filename.to_string(),
                                         folder: folder.clone(),
@@ -107,7 +108,14 @@ fn read_xlsx(folder: String) {
                                         "Iniciando verificação dos arquivos: {:?}",
                                         file.start_at
                                     );
-                                    reader(file.folder, &file.filename, file.start_at);
+
+                                    let FileProps {
+                                        filename,
+                                        folder,
+                                        start_at,
+                                    } = file;
+
+                                    reader(folder, &filename, start_at);
                                 }
                                 None => todo!(),
                             }
@@ -126,6 +134,6 @@ fn read_xlsx(folder: String) {
 }
 
 fn main() {
-    let filespath = String::from("src/data");
-    read_xlsx(filespath);
+    let data_path = String::from("./src/data");
+    read_xlsx(data_path);
 }
